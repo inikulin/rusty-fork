@@ -60,7 +60,7 @@ use syn::{AttributeArgs, Error, ItemFn, Lit, Meta, NestedMeta, ReturnType};
 pub fn test_fork(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as AttributeArgs);
 
-    let mut crate_name = quote::quote! { rusty_fork };
+    let mut crate_name = quote::quote! { two_rusty_forks };
     let mut timeout = quote::quote! { 0 };
 
     for arg in args {
