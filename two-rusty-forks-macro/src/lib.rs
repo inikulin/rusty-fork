@@ -135,9 +135,9 @@ pub fn test_fork(args: TokenStream, item: TokenStream) -> TokenStream {
 
             fn supervise_fn(
                 child: &mut ::#crate_name::ChildWrapper,
-                _file: &mut ::std::fs::File
+                file: &mut ::std::fs::File
             ) {
-                ::#crate_name::fork_test::supervise_child(child, #timeout)
+                ::#crate_name::fork_test::supervise_child(child, file, #timeout)
             }
             let supervise:
                 fn (&mut ::#crate_name::ChildWrapper, &mut ::std::fs::File) =
@@ -156,8 +156,8 @@ pub fn test_fork(args: TokenStream, item: TokenStream) -> TokenStream {
 
 #[cfg(test)]
 mod test {
-    use two_rusty_forks::test_fork;
     use std::io::Result;
+    use two_rusty_forks::test_fork;
 
     #[test_fork]
     fn trivials() {}

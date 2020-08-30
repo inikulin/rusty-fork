@@ -12,6 +12,8 @@
 //! Some functionality in this module is useful to other implementors and
 //! unlikely to change. This subset is documented and considered stable.
 
+use std::fs::File;
+use std::io::{self, Read, Seek};
 use std::process::Command;
 
 use crate::child_wrapper::ChildWrapper;
@@ -82,8 +84,8 @@ macro_rules! rusty_fork_test {
             let body: fn () = body_fn;
 
             fn supervise_fn(child: &mut $crate::ChildWrapper,
-                            _file: &mut ::std::fs::File) {
-                $crate::fork_test::supervise_child(child, $timeout)
+                            file: &mut ::std::fs::File) {
+                $crate::fork_test::supervise_child(child, file, $timeout)
             }
             let supervise:
                 fn (&mut $crate::ChildWrapper, &mut ::std::fs::File) =
@@ -120,52 +122,77 @@ macro_rules! rusty_fork_test {
 #[macro_export]
 macro_rules! rusty_fork_test_name {
     ($function_name:ident) => {
-        $crate::fork_test::fix_module_path(
-            concat!(module_path!(), "::", stringify!($function_name)))
-    }
+        $crate::fork_test::fix_module_path(concat!(
+            module_path!(),
+            "::",
+            stringify!($function_name)
+        ))
+    };
+}
+
+fn read_child_output(file: &mut File) -> String {
+    let mut out = vec![];
+
+    file.seek(io::SeekFrom::Start(0)).unwrap();
+    file.read_to_end(&mut out).unwrap();
+
+    String::from_utf8_lossy(&out).to_string()
 }
 
 #[allow(missing_docs)]
 #[doc(hidden)]
-pub fn supervise_child(child: &mut ChildWrapper, timeout_ms: u64) {
+pub fn supervise_child(child: &mut ChildWrapper, file: &mut File, timeout_ms: u64) {
     if timeout_ms > 0 {
-        wait_timeout(child, timeout_ms)
+        wait_timeout(child, file, timeout_ms)
     } else {
         let status = child.wait().expect("failed to wait for child");
-        assert!(status.success(),
-                "child exited unsuccessfully with {}", status);
+        let out = read_child_output(file);
+        assert!(
+            status.success(),
+            "test child process exited unsuccessfully: {}",
+            out
+        );
     }
 }
 
 #[allow(missing_docs)]
 #[doc(hidden)]
-pub fn no_configure_child(_child: &mut Command) { }
+pub fn no_configure_child(_child: &mut Command) {}
 
 /// Transform a string representing a qualified path as generated via
 /// `module_path!()` into a qualified path as expected by the standard Rust
 /// test harness.
 pub fn fix_module_path(path: &str) -> &str {
-    path.find("::").map(|ix| &path[ix+2..]).unwrap_or(path)
+    path.find("::").map(|ix| &path[ix + 2..]).unwrap_or(path)
 }
 
 #[cfg(feature = "timeout")]
-fn wait_timeout(child: &mut ChildWrapper, timeout_ms: u64) {
+fn wait_timeout(child: &mut ChildWrapper, file: &mut File, timeout_ms: u64) {
     use std::time::Duration;
 
     let timeout = Duration::from_millis(timeout_ms);
-    let status = child.wait_timeout(timeout).expect("failed to wait for child");
+    let status = child
+        .wait_timeout(timeout)
+        .expect("failed to wait for child");
     if let Some(status) = status {
-        assert!(status.success(),
-                "child exited unsuccessfully with {}", status);
+        let out = read_child_output(file);
+
+        assert!(
+            status.success(),
+            "test child process exited unsuccessfully: {}",
+            out
+        );
     } else {
-        panic!("child process exceeded {} ms timeout", timeout_ms);
+        panic!("test child process exceeded {} ms timeout", timeout_ms);
     }
 }
 
 #[cfg(not(feature = "timeout"))]
 fn wait_timeout(_: &mut ChildWrapper, _: u64) {
-    panic!("Using the timeout feature of rusty_fork_test! requires \
-            enabling the `timeout` feature on the rusty-fork crate.");
+    panic!(
+        "Using the timeout feature of rusty_fork_test! requires \
+            enabling the `timeout` feature on the rusty-fork crate."
+    );
 }
 
 #[cfg(test)]

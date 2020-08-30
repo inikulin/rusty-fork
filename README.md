@@ -1,4 +1,13 @@
-# rusty-fork
+# two-rusty-fork
+------------------------------
+**NOTE:** This is a fork of excellent [rusty-fork](https://github.com/AltSysrq/rusty-fork) - it's
+a fork of the fork, thus the name.
+
+Differences with the original:
+- Added yet unmerged pull request that introduces procedural macros: https://github.com/AltSysrq/rusty-fork/pull/11
+- Test output attached to parent's panic message instead of being printed to stdout.
+
+------------------------------
 
 [![Build Status](https://travis-ci.org/AltSysrq/rusty-fork.svg?branch=master)](https://travis-ci.org/AltSysrq/rusty-fork)
 [![](http://meritbadge.herokuapp.com/rusty-fork)](https://crates.io/crates/rusty-fork)
