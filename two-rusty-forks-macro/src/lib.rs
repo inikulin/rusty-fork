@@ -16,7 +16,7 @@ use syn::{AttributeArgs, Error, ItemFn, Lit, Meta, NestedMeta, ReturnType};
 /// #[cfg(test)]
 /// # */
 /// mod test {
-///     use rusty_fork::test_fork;
+///     use two_rusty_forks::test_fork;
 ///
 ///     # /*
 ///     #[test_fork]
@@ -39,7 +39,7 @@ use syn::{AttributeArgs, Error, ItemFn, Lit, Meta, NestedMeta, ReturnType};
 /// the block, like so:
 ///
 /// ```
-/// use rusty_fork::test_fork;
+/// use two_rusty_forks::test_fork;
 ///
 /// # /*
 /// #[test_fork(timeout_ms = 1000)]
@@ -156,7 +156,7 @@ pub fn test_fork(args: TokenStream, item: TokenStream) -> TokenStream {
 
 #[cfg(test)]
 mod test {
-    use rusty_fork::test_fork;
+    use two_rusty_forks::test_fork;
     use std::io::Result;
 
     #[test_fork]

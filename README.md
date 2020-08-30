@@ -45,7 +45,7 @@ Then, you can simply wrap any test(s) to be isolated with the
 [`rusty_fork_test!`](macro.rusty_fork_test.html) macro.
 
 ```rust
-use rusty_fork::rusty_fork_test;
+use two_rusty_forks::rusty_fork_test;
 
 rusty_fork_test! {
     #[test]

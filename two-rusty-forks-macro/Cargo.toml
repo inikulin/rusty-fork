@@ -1,11 +1,11 @@
 [package]
-name = "rusty-fork-macro"
+name = "two-rusty-forks-macro"
 version = "0.1.0"
-authors = ["Jason Lingle"]
+authors = ["Jason Lingle", "Ivan Nikulin <ifaaan@gmail.com>"]
 license = "MIT/Apache-2.0"
-readme = "README.md"
+readme = "../README.md"
 repository = "https://github.com/altsysrq/rusty-fork"
-documentation = "https://docs.rs/rusty-fork-macro"
+documentation = "https://docs.rs/two-rusty-forks-macro"
 keywords = ["testing", "process", "fork"]
 categories = ["development-tools::testing"]
 edition = "2018"
@@ -22,5 +22,5 @@ quote = "1"
 syn = { version = "1", features = ["full"] }
 
 [dev-dependencies]
-rusty-fork = { path = "../", features = ["macro", "timeout"] }
+two-rusty-forks = { path = "../", features = ["macro", "timeout"] }
 tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
